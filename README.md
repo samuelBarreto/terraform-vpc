@@ -5,17 +5,18 @@
 Este projeto utiliza Terraform para provisionar uma infraestrutura de rede (VPC) na AWS, pronta para receber clusters Kubernetes (EKS) ou outras aplicações em nuvem. O objetivo é criar uma base de rede segura, escalável e de fácil manutenção, seguindo boas práticas de arquitetura AWS.
 
 ## Estrutura do Projeto
-
-terraform-vpc/
- ├── main.tf 
- ├── variables.tf
- ├── outputs.tf 
- ├── terraform.tfvars 
- ├── modules/ 
- │ └── vpc/ 
- │ ├── main.tf 
- │ ├── variables.tf 
- │ ├── outputs.tf
+```
+    terraform-vpc/
+    ├── main.tf 
+    ├── variables.tf
+    ├── outputs.tf 
+    ├── terraform.tfvars 
+    ├── modules/ 
+    │ └── vpc/ 
+    │ ├── main.tf 
+    │ ├── variables.tf 
+    │ ├── outputs.tf
+```
 
 - **main.tf**: Chama o módulo VPC e define o provider.
 - **variables.tf**: Declara as variáveis usadas no projeto.
