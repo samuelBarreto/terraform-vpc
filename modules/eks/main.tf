@@ -293,6 +293,15 @@ resource "helm_release" "apps" {
     }
   }
 
+  # Injetar subnets dinamicamente para o NGINX Ingress Controller
+  dynamic "set" {
+    for_each = each.value.name == "nginx-ingress" ? [1] : []
+    content {
+      name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-subnets"
+      value = join(",", var.public_subnet_ids)
+    }
+  }
+
   values = each.value.values != null ? [yamlencode(each.value.values)] : []
 
   depends_on = [

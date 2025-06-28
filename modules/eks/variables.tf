@@ -29,6 +29,12 @@ variable "public_subnet_ids" {
   type        = list(string)
 }
 
+variable "ingress_subnets" {
+  description = "Subnets específicas para o Ingress Controller (opcional, sobrescreve public_subnet_ids)"
+  type        = string
+  default     = null
+}
+
 variable "kms_key_arn" {
   description = "ARN da KMS key para criptografia"
   type        = string

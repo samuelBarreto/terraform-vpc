@@ -53,6 +53,9 @@ module "eks" {
   private_subnet_ids = module.vpc.private_subnet_ids
   public_subnet_ids = module.vpc.public_subnet_ids
   
+  # Variável opcional para subnets específicas do Ingress
+  ingress_subnets = var.ingress_subnets
+  
   kms_key_arn = aws_kms_key.eks.arn
   
   cluster_endpoint_private_access = var.cluster_endpoint_private_access

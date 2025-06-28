@@ -153,3 +153,15 @@ variable "helm_releases" {
   }))
   default = {}
 }
+
+# =============================================================================
+# CONFIGURAÇÕES DO EKS
+# =============================================================================
+
+# Variável opcional para subnets específicas do Ingress Controller
+# Se não definida, usa as subnets públicas automaticamente
+variable "ingress_subnets" {
+  description = "Subnets específicas para o Ingress Controller"
+  type        = list(string)
+  default     = null
+}

@@ -344,6 +344,47 @@ Para suporte e dúvidas:
 - Consulte a documentação da AWS EKS
 - Verifique os logs do Terraform
 
+## **🌐 Configuração de Domínio Personalizado**
+
+### **Usando seu próprio domínio (ex: plannerdirect.com)**
+
+1. **Configure o NGINX Ingress Controller:**
+   ```bash
+   # As subnets são injetadas automaticamente pelo Terraform
+   terraform init
+   terraform plan
+   terraform apply
+   ```
+
+2. **Configure o Route 53:**
+   ```bash
+   # Execute o script de configuração do Route 53
+   chmod +x scripts/setup-route53.sh
+   ./scripts/setup-route53.sh
+   ```
+lo fornecido o
+3. **Aplique sua aplicação:**
+   ```bash
+   # Use o exempu crie sua própria aplicação
+   kubectl apply -f examples/plannerdirect-app.yaml
+   ```
+
+### **Vantagens da Configuração Dinâmica:**
+
+- ✅ **Subnets automáticas**: Não precisa atualizar manualmente os IDs das subnets
+- ✅ **Flexibilidade**: Funciona em qualquer região ou conta AWS
+- ✅ **Manutenibilidade**: Mudanças na infraestrutura são refletidas automaticamente
+- ✅ **Escalabilidade**: Fácil de replicar para outros ambientes
+
+### **Verificar Subnets Atuais:**
+```bash
+# Ver subnets públicas atuais
+./scripts/update-subnets.sh
+
+# Ou via Terraform
+terraform output public_subnet_ids
+```
+
 ---
 
 **Desenvolvido com ❤️ para a comunidade Kubernetes**

@@ -4,7 +4,7 @@
 
 aws_region = "us-east-1"
 profile    = "admin-samuel"
-name       = "my-eks-cluster"
+name       = "my-eks-cluster-helm"
 environment = "dev"
 
 # =============================================================================
@@ -119,6 +119,44 @@ aws_auth_roles = [
 # CONFIGURAÇÕES DOS HELM RELEASES
 # =============================================================================
 
-# Helm releases vazios por enquanto - você pode adicionar depois
-helm_releases = {}
+# Helm releases para instalar automaticamente
+helm_releases = {
+  # NGINX Ingress Controller
+  nginx-ingress = {
+    name             = "nginx-ingress"
+    repository       = "https://kubernetes.github.io/ingress-nginx"
+    chart            = "ingress-nginx"
+    version          = "4.7.1"
+    namespace        = "ingress-nginx"
+    create_namespace = true
+    values = {
+      controller = {
+        service = {
+          type = "LoadBalancer"
+          annotations = {
+            "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+            "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
+            "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type" = "ip"
+            
+          }
+        }
+        config = {
+          "use-proxy-protocol" = "false"
+          "proxy-real-ip-cidr" = "0.0.0.0/0"
+        }
+        resources = {
+          requests = {
+            cpu    = "100m"
+            memory = "128Mi"
+          }
+          limits = {
+            cpu    = "200m"
+            memory = "256Mi"
+          }
+        }
+      }
+    }
+    set = []
+  }
+}
 
