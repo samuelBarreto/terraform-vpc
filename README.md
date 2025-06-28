@@ -1,123 +1,349 @@
-# Projeto Terraform VPC para EKS
+# Terraform EKS Cluster com VPC
 
-## Introdução
+Este projeto Terraform cria uma infraestrutura completa para um cluster EKS (Elastic Kubernetes Service) na AWS, incluindo VPC com subnets públicas e privadas, cluster EKS com node groups gerenciados, e configurações avançadas de segurança e automação.
 
-Este projeto utiliza Terraform para provisionar uma infraestrutura de rede (VPC) na AWS, pronta para receber clusters Kubernetes (EKS) ou outras aplicações em nuvem. O objetivo é criar uma base de rede segura, escalável e de fácil manutenção, seguindo boas práticas de arquitetura AWS.
+## 🏗️ Arquitetura
 
-## Estrutura do Projeto
+O projeto cria a seguinte infraestrutura:
+
+- **VPC** com subnets públicas e privadas em múltiplas AZs
+- **NAT Gateway** para conectividade das subnets privadas
+- **Cluster EKS** com criptografia KMS
+- **Managed Node Groups** para workers EC2
+- **EKS Addons**: CoreDNS, kube-proxy, VPC-CNI
+- **IAM Roles** para cluster e nodes
+- **AWS Auth ConfigMap** para controle de acesso
+- **Helm Releases** para instalação automática de aplicações
+
+## 📁 Estrutura do Projeto
+
 ```
-    terraform-vpc/
-    ├── main.tf 
-    ├── variables.tf
-    ├── outputs.tf 
-    ├── terraform.tfvars 
-    ├── modules/ 
-    │ └── vpc/ 
-    │ ├── main.tf 
-    │ ├── variables.tf 
-    │ ├── outputs.tf
+terraform-vpc/
+├── main.tf                 # Configuração principal
+├── variables.tf            # Variáveis do projeto
+├── outputs.tf              # Outputs do projeto
+├── versions.tf             # Versões dos providers
+├── terraform.tfvars        # Valores das variáveis
+├── README.md               # Documentação
+└── modules/
+    ├── vpc/
+    │   ├── main.tf         # Módulo VPC
+    │   ├── variables.tf    # Variáveis do VPC
+    │   └── outputs.tf      # Outputs do VPC
+    └── eks/
+        ├── main.tf         # Módulo EKS
+        ├── variables.tf    # Variáveis do EKS
+        └── outputs.tf      # Outputs do EKS
 ```
 
-- **main.tf**: Chama o módulo VPC e define o provider.
-- **variables.tf**: Declara as variáveis usadas no projeto.
-- **outputs.tf**: Exporta os principais IDs de recursos criados.
-- **terraform.tfvars**: Define os valores das variáveis para o ambiente.
-- **modules/vpc/**: Implementação do módulo reutilizável para criação da VPC e seus componentes.
+## 🚀 Funcionalidades
 
-## Recursos Criados
+### ✅ Cluster EKS (Control Plane)
+- Versão configurável do Kubernetes
+- Criptografia de secrets com KMS
+- Endpoints público e privado configuráveis
+- Logs habilitados para auditoria
 
-- **VPC**: Rede isolada para todos os recursos AWS.
-- **Subnets Públicas e Privadas**: Permitem separar recursos que precisam de acesso externo dos que ficam isolados.
-- **Internet Gateway**: Necessário para dar acesso à internet às subnets públicas.
-- **NAT Gateway**: Permite que recursos em subnets privadas acessem a internet de forma segura.
-- **Elastic IP (EIP)**: IP público fixo para o NAT Gateway.
-- **Route Tables e Associações**: Controlam o roteamento do tráfego entre subnets, internet e NAT.
-- **Tags de Ambiente**: Todos os recursos recebem a tag `Environment` para facilitar o gerenciamento e identificação.
+### ✅ Managed Node Groups
+- Múltiplos node groups com configurações diferentes
+- Suporte a labels e taints
+- Auto-scaling configurável
+- Diferentes tipos de instância
 
-## Por que cada recurso é necessário?
+### ✅ IAM Roles
+- **Cluster Role**: Permissões para o control plane EKS
+- **Node Group Role**: Permissões para os workers
+- **AWS Auth**: Controle de acesso de usuários e roles
 
-- **VPC**: Isola e organiza a rede dos seus recursos na AWS.
-- **Subnets Públicas**: Hospedam recursos que precisam ser acessados de fora da VPC (ex: Load Balancers).
-- **Subnets Privadas**: Hospedam recursos internos, como bancos de dados ou nodes privados do EKS, aumentando a segurança.
-- **Internet Gateway**: Permite que recursos em subnets públicas acessem a internet.
-- **NAT Gateway + EIP**: Permite que recursos em subnets privadas façam requisições para a internet (ex: baixar atualizações), sem ficarem expostos.
-- **Route Tables**: Garantem que o tráfego seja roteado corretamente entre subnets, internet e NAT.
-- **Tags**: Facilitam a organização, automação e controle de custos na AWS.
+### ✅ KMS Key
+- Criptografia de dados em repouso
+- Rotação automática de chaves
+- Criptografia de secrets do Kubernetes
 
----
+### ✅ EKS Addons
+- **CoreDNS**: Resolução DNS interna
+- **kube-proxy**: Networking do cluster
+- **VPC-CNI**: Plugin de rede AWS
 
-**Observação:**  
-Esta estrutura modular permite fácil reutilização e integração com outros projetos Terraform, especialmente para clusters EKS e workloads modernos.
+### ✅ Helm Integration
+- Instalação automática de aplicações via Helm
+- Suporte a múltiplos charts
+- Configuração via values e set
 
----
+## 📋 Pré-requisitos
 
-## Comandos para criar e destruir os recursos
+- Terraform >= 1.0
+- AWS CLI configurado
+- kubectl instalado
+- Helm instalado (opcional)
 
-```sh
-# Inicializar o Terraform (executar apenas uma vez no início)
+## 🔧 Configuração
+
+### 1. Configurar AWS Credentials
+
+```bash
+aws configure
+```
+
+### 2. Personalizar `terraform.tfvars`
+
+Edite o arquivo `terraform.tfvars` com suas configurações:
+
+```hcl
+aws_region = "us-east-1"
+name       = "my-eks-cluster"
+environment = "dev"
+
+# VPC Configuration
+vpc_cidr = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+private_subnets = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+# EKS Configuration
+cluster_version = "1.28"
+service_ipv4_cidr = "172.20.0.0/16"
+
+# Node Groups
+node_groups = {
+  default = {
+    name                   = "default"
+    instance_types         = ["t3.medium"]
+    capacity_type          = "ON_DEMAND"
+    min_size               = 1
+    max_size               = 3
+    desired_size           = 2
+    disk_size              = 20
+    ami_type               = "AL2_x86_64"
+    force_update_version   = true
+    labels = {
+      "node.kubernetes.io/role" = "worker"
+      "environment"             = "dev"
+    }
+    taints = []
+  }
+}
+
+# AWS Auth Users/Roles
+aws_auth_users = [
+  {
+    userarn  = "arn:aws:iam::123456789012:user/admin-user"
+    username = "admin-user"
+    groups   = ["system:masters"]
+  }
+]
+
+# Helm Releases
+helm_releases = {
+  nginx_ingress = {
+    name             = "nginx-ingress"
+    repository       = "https://kubernetes.github.io/ingress-nginx"
+    chart            = "ingress-nginx"
+    version          = "4.7.1"
+    namespace        = "ingress-nginx"
+    create_namespace = true
+    values = {
+      controller = {
+        service = {
+          type = "LoadBalancer"
+        }
+      }
+    }
+  }
+}
+```
+
+### 3. Deploy da Infraestrutura
+
+```bash
+# Inicializar Terraform
 terraform init
 
-# Visualizar o plano de execução
+# Verificar o plano
 terraform plan
 
-# Aplicar as mudanças e criar a infraestrutura
+# Aplicar as mudanças
 terraform apply
+```
 
-# Destruir todos os recursos criados
+### 4. Configurar kubectl
+
+Após o deploy, configure o kubectl:
+
+```bash
+# Atualizar kubeconfig
+aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster
+
+# Verificar conexão
+kubectl get nodes
+```
+
+## 🔐 Configuração de Acesso
+
+### AWS Auth ConfigMap
+
+O módulo cria automaticamente o `aws-auth` ConfigMap com:
+
+- Mapeamento da role dos node groups
+- Usuários e roles configurados via variáveis
+- Permissões de acesso ao cluster
+
+### Exemplo de Configuração de Usuário
+
+```hcl
+aws_auth_users = [
+  {
+    userarn  = "arn:aws:iam::123456789012:user/developer"
+    username = "developer"
+    groups   = ["system:authenticated"]
+  }
+]
+```
+
+### Exemplo de Configuração de Role
+
+```hcl
+aws_auth_roles = [
+  {
+    rolearn  = "arn:aws:iam::123456789012:role/eks-admin"
+    username = "eks-admin"
+    groups   = ["system:masters"]
+  }
+]
+```
+
+## 🎯 Helm Releases
+
+### Instalação Automática de Aplicações
+
+O módulo suporta instalação automática de aplicações via Helm:
+
+```hcl
+helm_releases = {
+  nginx_ingress = {
+    name             = "nginx-ingress"
+    repository       = "https://kubernetes.github.io/ingress-nginx"
+    chart            = "ingress-nginx"
+    version          = "4.7.1"
+    namespace        = "ingress-nginx"
+    create_namespace = true
+    values = {
+      controller = {
+        service = {
+          type = "LoadBalancer"
+        }
+      }
+    }
+    set = [
+      {
+        name  = "controller.service.externalTrafficPolicy"
+        value = "Local"
+      }
+    ]
+  }
+}
+```
+
+### Aplicações Recomendadas
+
+- **nginx-ingress**: Load balancer e ingress controller
+- **cert-manager**: Gerenciamento de certificados SSL
+- **metrics-server**: Métricas do cluster
+- **prometheus-operator**: Monitoramento
+- **fluent-bit**: Logging
+
+## 📊 Outputs Importantes
+
+Após o deploy, você terá acesso aos seguintes outputs:
+
+```bash
+# Informações do cluster
+terraform output cluster_name
+terraform output cluster_endpoint
+terraform output cluster_oidc_issuer_url
+
+# Configuração kubectl
+terraform output kubeconfig
+
+# Informações dos node groups
+terraform output node_groups
+
+# ARNs das IAM roles
+terraform output cluster_iam_role_arn
+terraform output node_group_iam_role_arn
+```
+
+## 🔧 Manutenção
+
+### Atualização do Cluster
+
+```bash
+# Atualizar versão do Kubernetes
+terraform apply -var="cluster_version=1.29"
+```
+
+### Escalar Node Groups
+
+```bash
+# Modificar tamanho dos node groups
+terraform apply -var='node_groups={"default":{"name":"default","instance_types":["t3.medium"],"capacity_type":"ON_DEMAND","min_size":2,"max_size":5,"desired_size":3,"disk_size":20,"ami_type":"AL2_x86_64","force_update_version":true,"labels":{"node.kubernetes.io/role":"worker"},"taints":[]}}'
+```
+
+### Adicionar Helm Releases
+
+```bash
+# Adicionar nova aplicação
+terraform apply -var='helm_releases={"new-app":{"name":"new-app","repository":"https://repo.example.com","chart":"my-chart","version":"1.0.0","namespace":"my-app","create_namespace":true,"values":{},"set":[]}}'
+```
+
+## 🧹 Limpeza
+
+Para destruir toda a infraestrutura:
+
+```bash
 terraform destroy
 ```
 
-# log de criação 
+**⚠️ Atenção**: Este comando irá deletar todo o cluster EKS e todos os recursos associados.
 
-    Apply complete! Resources: 14 added, 0 changed, 0 destroyed.
+## 🔒 Segurança
 
-    Outputs:
+### Boas Práticas Implementadas
 
-    private_subnet_ids = [
-    "subnet-027adc7f939b20e1d",
-    "subnet-07de815b354a970f1",
-    ]
-    public_subnet_ids = [
-    "subnet-0560da61477904327",
-    "subnet-083d8ac6b9bc3d4ae",
-    ]
-    vpc_id = "vpc-0e764bf02c51fb00e"
+- **Criptografia**: Secrets criptografados com KMS
+- **IAM**: Roles com privilégios mínimos
+- **Networking**: Subnets privadas para nodes
+- **Logs**: Auditoria habilitada
+- **Updates**: Versões fixas para addons
 
-# log destruir os recursos
+### Recomendações Adicionais
 
+- Configure Network Policies
+- Use Pod Security Standards
+- Implemente RBAC granular
+- Configure backup de etcd
+- Monitore logs de auditoria
 
-    module.vpc.aws_route_table_association.private[1]: Destroying... [id=rtbassoc-04e461f92f4dded34]
-    module.vpc.aws_route_table_association.public[1]: Destroying... [id=rtbassoc-0f0dec891e9cb7656]
-    module.vpc.aws_route_table_association.public[0]: Destroying... [id=rtbassoc-0e52a3a6081ec821d]
-    module.vpc.aws_route_table_association.private[0]: Destroying... [id=rtbassoc-03c68f506c0ee13a3]
-    module.vpc.aws_route_table_association.public[1]: Destruction complete after 1s
-    module.vpc.aws_route_table_association.private[1]: Destruction complete after 1s
-    module.vpc.aws_route_table_association.private[0]: Destruction complete after 1s
-    module.vpc.aws_route_table_association.public[0]: Destruction complete after 1s
-    module.vpc.aws_route_table.public: Destroying... [id=rtb-0a6a7ea2b7df57173]
-    module.vpc.aws_subnet.private[0]: Destroying... [id=subnet-027adc7f939b20e1d]
-    module.vpc.aws_route_table.private[0]: Destroying... [id=rtb-07985f72133a2834c]
-    module.vpc.aws_subnet.private[1]: Destroying... [id=subnet-07de815b354a970f1]
-    module.vpc.aws_subnet.private[1]: Destruction complete after 1s
-    module.vpc.aws_subnet.private[0]: Destruction complete after 1s
-    module.vpc.aws_route_table.private[0]: Destruction complete after 1s
-    module.vpc.aws_nat_gateway.this[0]: Destroying... [id=nat-0c2763f47de9e2a92]
-    module.vpc.aws_route_table.public: Destruction complete after 1s
-    module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-0c2763f47de9e2a92, 10s elapsed]
-    module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-0c2763f47de9e2a92, 20s elapsed]
-    module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-0c2763f47de9e2a92, 30s elapsed]
-    module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-0c2763f47de9e2a92, 40s elapsed]
-    module.vpc.aws_nat_gateway.this[0]: Still destroying... [id=nat-0c2763f47de9e2a92, 50s elapsed]
-    module.vpc.aws_nat_gateway.this[0]: Destruction complete after 52s
-    module.vpc.aws_subnet.public[1]: Destroying... [id=subnet-083d8ac6b9bc3d4ae]
-    module.vpc.aws_subnet.public[0]: Destroying... [id=subnet-0560da61477904327]
-    module.vpc.aws_eip.nat[0]: Destroying... [id=eipalloc-00f22823eb8dd7ae2]
-    module.vpc.aws_subnet.public[0]: Destruction complete after 1s
-    module.vpc.aws_subnet.public[1]: Destruction complete after 1s
-    module.vpc.aws_eip.nat[0]: Destruction complete after 1s
-    module.vpc.aws_internet_gateway.this: Destroying... [id=igw-0ac43fc3715ed21f9]
-    module.vpc.aws_internet_gateway.this: Destruction complete after 1s
-    module.vpc.aws_vpc.this: Destroying... [id=vpc-0e764bf02c51fb00e]
-    module.vpc.aws_vpc.this: Destruction complete after 1s
+## 🤝 Contribuição
 
-    Destroy complete! Resources: 14 destroyed.
+1. Fork o projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
+5. Abra um Pull Request
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
+
+## 🆘 Suporte
+
+Para suporte e dúvidas:
+
+- Abra uma issue no GitHub
+- Consulte a documentação da AWS EKS
+- Verifique os logs do Terraform
+
+---
+
+**Desenvolvido com ❤️ para a comunidade Kubernetes**

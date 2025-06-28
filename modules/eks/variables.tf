@@ -1,57 +1,37 @@
-variable "aws_region" {
-  description = "AWS region"
-  type        = string
-}
-
-variable "profile" {
-  description = "AWS profile"
-  type        = string
-}
-
 variable "name" {
-  description = "Nome base dos recursos"
+  description = "Nome do cluster EKS"
   type        = string
 }
-
-variable "vpc_cidr" {
-  description = "CIDR da VPC"
-  type        = string
-}
-
-variable "availability_zones" {
-  description = "Lista de AZs"
-  type        = list(string)
-}
-
-variable "public_subnets" {
-  description = "Lista de CIDRs das subnets públicas"
-  type        = list(string)
-}
-
-variable "private_subnets" {
-  description = "Lista de CIDRs das subnets privadas"
-  type        = list(string)
-}
-
-variable "create_nat_gateway" {
-  description = "Se deve criar NAT Gateway"
-  type        = bool
-  default     = true
-}
-
-variable "environment" {
-  description = "Ambiente (ex: dev, staging, prod)"
-  type        = string
-}
-
-# =============================================================================
-# EKS VARIABLES
-# =============================================================================
 
 variable "cluster_version" {
   description = "Versão do Kubernetes para o cluster EKS"
   type        = string
   default     = "1.28"
+}
+
+variable "vpc_id" {
+  description = "ID da VPC onde o cluster será criado"
+  type        = string
+}
+
+variable "subnet_ids" {
+  description = "IDs das subnets onde o cluster será criado"
+  type        = list(string)
+}
+
+variable "private_subnet_ids" {
+  description = "IDs das subnets privadas para os node groups"
+  type        = list(string)
+}
+
+variable "public_subnet_ids" {
+  description = "IDs das subnets públicas para load balancers"
+  type        = list(string)
+}
+
+variable "kms_key_arn" {
+  description = "ARN da KMS key para criptografia"
+  type        = string
 }
 
 variable "cluster_endpoint_private_access" {
@@ -153,3 +133,9 @@ variable "helm_releases" {
   }))
   default = {}
 }
+
+variable "tags" {
+  description = "Tags para aplicar aos recursos"
+  type        = map(string)
+  default     = {}
+} 
