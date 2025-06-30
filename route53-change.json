@@ -1,0 +1,28 @@
+{
+    "Changes": [
+        {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "plannerdirect.com",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z26RNL4JYFTOTI",
+                    "DNSName": "a059bd8b0d1d24b52b78afb1a29fdcba-c78a86f1ee88eb3c.elb.us-east-1.amazonaws.com",
+                    "EvaluateTargetHealth": true
+                }
+            }
+        },
+        {
+            "Action": "UPSERT",
+            "ResourceRecordSet": {
+                "Name": "www.plannerdirect.com",
+                "Type": "A",
+                "AliasTarget": {
+                    "HostedZoneId": "Z26RNL4JYFTOTI",
+                    "DNSName": "a059bd8b0d1d24b52b78afb1a29fdcba-c78a86f1ee88eb3c.elb.us-east-1.amazonaws.com",
+                    "EvaluateTargetHealth": true
+                }
+            }
+        }
+    ]
+}

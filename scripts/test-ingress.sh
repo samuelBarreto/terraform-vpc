@@ -1,83 +1,81 @@
 #!/bin/bash
 
-# =============================================================================
-# TESTE DO NGINX INGRESS CONTROLLER
-# =============================================================================
+# Script de teste rápido para o Ingress Controller
+# Uso: ./scripts/test-ingress.sh [NAMESPACE] [SERVICE_NAME] [TIMEOUT]
+# Exemplo: ./scripts/test-ingress.sh ingress-nginx nginx-ingress-ingress-nginx-controller 60
 
 set -e
 
-CLUSTER_NAME=${CLUSTER_NAME:-"my-eks-cluster"}
-AWS_REGION=${AWS_REGION:-"us-east-1"}
+# Parâmetros via linha de comando com valores padrão
+NAMESPACE=${1:-"ingress-nginx"}
+SERVICE_NAME=${2:-"nginx-ingress-ingress-nginx-controller"}
+TIMEOUT=${3:-60}
 
-echo "================================
-TESTE DO NGINX INGRESS CONTROLLER
-================================
-[INFO] Cluster: $CLUSTER_NAME
-[INFO] Região: $AWS_REGION
-================================
-1. VERIFICANDO NGINX INGRESS CONTROLLER
-================================
-[INFO] Verificando namespace ingress-nginx..."
-kubectl get namespace ingress-nginx
+echo "🧪 TESTE RÁPIDO DO INGRESS CONTROLLER"
+echo "====================================="
+echo ""
+echo "📋 Parâmetros utilizados:"
+echo "   Namespace: $NAMESPACE"
+echo "   Serviço: $SERVICE_NAME"
+echo "   Timeout: ${TIMEOUT}s"
+echo ""
 
-echo "[INFO] Verificando pods do NGINX Ingress Controller..."
-kubectl get pods -n ingress-nginx
+echo "🔍 Verificando se o serviço existe..."
 
-echo "[INFO] Verificando service do NGINX Ingress Controller..."
-kubectl get svc -n ingress-nginx
-
-echo "================================
-2. OBTENDO ENDEREÇO DO LOAD BALANCER
-================================
-[INFO] Aguardando o Load Balancer ficar pronto..."
-kubectl wait --for=condition=Ready service/nginx-ingress-ingress-nginx-controller -n ingress-nginx --timeout=300s
-
-echo "[INFO] Obtendo endereço do Load Balancer..."
-LB_HOSTNAME=$(kubectl get svc nginx-ingress-ingress-nginx-controller -n ingress-nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-
-if [ -z "$LB_HOSTNAME" ]; then
-    echo "[ERROR] Não foi possível obter o endereço do Load Balancer"
+# Verificar se o serviço existe
+if ! kubectl get service $SERVICE_NAME -n $NAMESPACE >/dev/null 2>&1; then
+    echo "❌ Serviço $SERVICE_NAME não existe!"
+    echo "   Execute primeiro: ./scripts/validate-ingress.sh"
     exit 1
 fi
 
-echo "[INFO] Load Balancer: $LB_HOSTNAME"
+echo "✅ Serviço existe"
 
-echo "================================
-3. APLICANDO EXEMPLO DE APLICAÇÃO
-================================
-[INFO] Aplicando exemplo de aplicação..."
-kubectl apply -f examples/nginx-ingress-example.yaml
-
-echo "[INFO] Aguardando pods da aplicação ficarem prontos..."
-kubectl wait --for=condition=Ready pod -l app=nginx-example -n example-app --timeout=300s
-
-echo "[INFO] Verificando pods da aplicação..."
-kubectl get pods -n example-app
-
-echo "================================
-4. TESTANDO O INGRESS
-================================
-[INFO] Verificando Ingress..."
-kubectl get ingress -n example-app
-
-echo "[INFO] Testando conectividade..."
-echo "[INFO] Teste manual: curl -H 'Host: example-app.local' http://$LB_HOSTNAME"
-
-echo "================================
-5. INFORMAÇÕES IMPORTANTES
-================================
-[INFO] Para acessar a aplicação, adicione ao /etc/hosts:"
-echo "$LB_HOSTNAME example-app.local"
 echo ""
-echo "[INFO] Ou teste diretamente:"
-echo "curl -H 'Host: example-app.local' http://$LB_HOSTNAME"
+echo "🔍 Obtendo endereço do Load Balancer..."
+
+# Obter endereço do Load Balancer
+LB_HOSTNAME=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || echo "")
+
+if [ -z "$LB_HOSTNAME" ]; then
+    echo "❌ Load Balancer não tem endereço ainda"
+    echo "   Aguardando..."
+    
+    # Aguardar o Load Balancer ficar pronto
+    kubectl wait --for=condition=Ready service/$SERVICE_NAME -n $NAMESPACE --timeout=${TIMEOUT}s
+    
+    # Tentar novamente
+    LB_HOSTNAME=$(kubectl get svc $SERVICE_NAME -n $NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+    
+    if [ -z "$LB_HOSTNAME" ]; then
+        echo "❌ Ainda não foi possível obter o endereço"
+        exit 1
+    fi
+fi
+
+echo "✅ Load Balancer: $LB_HOSTNAME"
+
 echo ""
-echo "[INFO] Para ver logs do Ingress Controller:"
-echo "kubectl logs -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx"
+echo "🌐 Testando conectividade..."
+
+# Testar conectividade
+if curl -s --max-time 10 "http://$LB_HOSTNAME" >/dev/null 2>&1; then
+    echo "✅ Load Balancer está respondendo"
+else
+    echo "⚠️  Load Balancer não está respondendo ainda"
+    echo "   Isso é normal nos primeiros minutos após a criação"
+fi
+
 echo ""
-echo "[INFO] Para ver logs da aplicação:"
-echo "kubectl logs -n example-app -l app=nginx-example"
+echo "📊 Status dos recursos:"
+
+echo "   Pods do Ingress Controller:"
+kubectl get pods -n $NAMESPACE -l app.kubernetes.io/name=ingress-nginx
+
 echo ""
-echo "================================
-TESTE CONCLUÍDO!
-================================ 
+echo "   Serviços no namespace:"
+kubectl get services -n $NAMESPACE
+
+echo ""
+echo "🎉 Teste concluído!"
+echo "   Endereço do Load Balancer: $LB_HOSTNAME" 

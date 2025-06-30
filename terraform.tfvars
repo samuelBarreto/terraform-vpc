@@ -4,7 +4,7 @@
 
 aws_region = "us-east-1"
 profile    = "admin-samuel"
-name       = "my-eks-cluster-helm"
+name       = "my-eks-cluster"
 environment = "dev"
 
 # =============================================================================
@@ -37,7 +37,7 @@ create_nat_gateway = true
 # CONFIGURAÇÕES DO EKS
 # =============================================================================
 
-cluster_version = "1.29"
+cluster_version = "1.30"
 
 cluster_endpoint_private_access = true
 cluster_endpoint_public_access  = true
@@ -137,7 +137,7 @@ helm_releases = {
             "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
             "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
             "service.beta.kubernetes.io/aws-load-balancer-nlb-target-type" = "ip"
-            
+            "service.beta.kubernetes.io/aws-load-balancer-subnets" = "subnet-08120d581b9165503,subnet-02c590a3dbf9bfe79,subnet-0dc24e4208685768d"
           }
         }
         config = {

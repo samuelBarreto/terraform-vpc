@@ -31,7 +31,7 @@ variable "public_subnet_ids" {
 
 variable "ingress_subnets" {
   description = "Subnets específicas para o Ingress Controller (opcional, sobrescreve public_subnet_ids)"
-  type        = string
+  type        = list(string)
   default     = null
 }
 
