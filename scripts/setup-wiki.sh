@@ -39,12 +39,25 @@ check_directory() {
     fi
 }
 
-# Verificar se a pasta wiki existe
-check_wiki_directory() {
+# Verificar se os arquivos da Wiki já existem
+check_wiki_files() {
+    print_message "Verificando arquivos da Wiki..."
+    
+    # Verificar se os arquivos da Wiki já estão na raiz
+    if [ -f "Home.md" ] && [ -f "_Sidebar.md" ]; then
+        print_warning "Arquivos da Wiki já existem na raiz do projeto"
+        print_message "Pulando cópia de arquivos..."
+        return 0
+    fi
+    
+    # Verificar se a pasta wiki existe
     if [ ! -d "wiki" ]; then
-        print_error "Pasta 'wiki' não encontrada. Execute primeiro o script de criação da Wiki."
+        print_error "Pasta 'wiki' não encontrada e arquivos da Wiki não estão na raiz."
+        print_error "Execute primeiro o script de criação da Wiki ou restaure os arquivos."
         exit 1
     fi
+    
+    return 1
 }
 
 # Verificar dependências
@@ -115,6 +128,12 @@ create_wiki_branch() {
 copy_wiki_files() {
     print_message "Copiando arquivos da Wiki..."
     
+    # Verificar se os arquivos já existem
+    if check_wiki_files; then
+        print_message "Arquivos da Wiki já estão na raiz ✓"
+        return
+    fi
+    
     # Copiar todos os arquivos da pasta wiki para a raiz
     cp -r wiki/* .
     
@@ -127,6 +146,11 @@ copy_wiki_files() {
 # Configurar arquivo _Sidebar.md
 setup_sidebar() {
     print_message "Configurando sidebar da Wiki..."
+    
+    # Verificar se o arquivo já existe
+    if [ -f "_Sidebar.md" ]; then
+        print_warning "Arquivo _Sidebar.md já existe. Atualizando..."
+    fi
     
     cat > _Sidebar.md << 'EOF'
 # 📚 Terraform EKS Wiki
@@ -159,6 +183,11 @@ EOF
 # Configurar arquivo _Footer.md
 setup_footer() {
     print_message "Configurando footer da Wiki..."
+    
+    # Verificar se o arquivo já existe
+    if [ -f "_Footer.md" ]; then
+        print_warning "Arquivo _Footer.md já existe. Atualizando..."
+    fi
     
     cat > _Footer.md << 'EOF'
 ---
@@ -246,7 +275,6 @@ main() {
     print_header
     
     check_directory
-    check_wiki_directory
     check_dependencies
     get_repo_info
     
