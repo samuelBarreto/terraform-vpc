@@ -97,17 +97,17 @@ get_repo_info() {
 
 # Criar branch da Wiki
 create_wiki_branch() {
-    print_message "Criando branch da Wiki..."
+    print_message "Criando branch generate-wiki..."
     
-    # Verificar se já existe uma branch wiki
-    if git branch -a | grep -q "remotes/origin/wiki"; then
-        print_warning "Branch 'wiki' já existe. Fazendo checkout..."
-        git checkout wiki
-        git pull origin wiki
+    # Verificar se já existe uma branch generate-wiki
+    if git branch -a | grep -q "remotes/origin/generate-wiki"; then
+        print_warning "Branch 'generate-wiki' já existe. Fazendo checkout..."
+        git checkout generate-wiki
+        git pull origin generate-wiki
     else
         # Criar nova branch
-        git checkout -b wiki
-        print_message "Branch 'wiki' criada ✓"
+        git checkout -b generate-wiki
+        print_message "Branch 'generate-wiki' criada ✓"
     fi
 }
 
@@ -116,7 +116,7 @@ copy_wiki_files() {
     print_message "Copiando arquivos da Wiki..."
     
     # Copiar todos os arquivos da pasta wiki para a raiz
-    cp -r wiki-page/* .
+    cp -r wiki/* .
     
     # Remover a pasta wiki original
     rm -rf wiki
@@ -196,7 +196,7 @@ Versão: 1.0.0"
 push_to_repo() {
     print_message "Enviando para o repositório..."
     
-    git push origin wiki
+    git push origin generate-wiki
     
     print_message "Push realizado ✓"
 }
@@ -237,6 +237,8 @@ show_next_steps() {
     echo "   - Revise regularmente"
     echo "   - Adicione novas funcionalidades"
     echo "   - Solicite feedback da equipe"
+    echo ""
+    echo "5. 🌿 Branch utilizada: generate-wiki"
 }
 
 # Função principal
