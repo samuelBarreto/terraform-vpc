@@ -86,7 +86,7 @@ jobs:
   cost-estimation:
     name: Cost Estimation
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    #if: github.event_name == 'pull_request'
     
     steps:
     - name: Checkout code
@@ -125,7 +125,7 @@ jobs:
     name: Test Infrastructure
     runs-on: ubuntu-latest
     needs: [validate, security]
-    if: github.ref == 'refs/heads/main'
+    #if: github.ref == 'refs/heads/main'
     
     steps:
     - name: Checkout code
