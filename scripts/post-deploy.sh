@@ -46,9 +46,16 @@ if [ -z "$AWS_REGION" ]; then
     exit 1
 fi
 
+# Definir perfil AWS padrão se não especificado
+if [ -z "$AWS_PROFILE" ]; then
+    AWS_PROFILE="admin-samuel"
+    print_warning "AWS_PROFILE não definido, usando: $AWS_PROFILE"
+fi
+
 print_header "CONFIGURAÇÃO PÓS-DEPLOY - EKS CLUSTER"
 print_message "Cluster: $CLUSTER_NAME"
 print_message "Região: $AWS_REGION"
+print_message "Profile: $AWS_PROFILE"
 
 # =============================================================================
 # 1. CONFIGURAR KUBECTL
@@ -57,7 +64,7 @@ print_message "Região: $AWS_REGION"
 print_header "1. CONFIGURANDO KUBECTL"
 
 print_message "Atualizando kubeconfig..."
-aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME --profile $AWS_PROFILE
 
 if [ $? -eq 0 ]; then
     print_message "Kubeconfig atualizado com sucesso!"
@@ -79,7 +86,15 @@ if [ $? -eq 0 ]; then
     print_message "Conexão com o cluster estabelecida!"
 else
     print_error "Falha ao conectar com o cluster"
-    exit 1
+    print_message "Tentando reconectar..."
+    aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME --profile $AWS_PROFILE
+    kubectl cluster-info
+    if [ $? -ne 0 ]; then
+        print_error "Ainda não foi possível conectar ao cluster"
+        print_message "Verifique se o cluster está ativo:"
+        print_message "aws eks describe-cluster --name $CLUSTER_NAME --region $AWS_REGION --profile $AWS_PROFILE"
+        exit 1
+    fi
 fi
 
 # =============================================================================

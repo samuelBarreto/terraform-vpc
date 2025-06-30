@@ -37,7 +37,7 @@ create_nat_gateway = true
 # CONFIGURAÇÕES DO EKS
 # =============================================================================
 
-cluster_version = "1.30"
+cluster_version = "1.31"
 
 cluster_endpoint_private_access = true
 cluster_endpoint_public_access  = true
