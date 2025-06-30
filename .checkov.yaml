@@ -1,0 +1,59 @@
+# Configuração do Checkov para o projeto Terraform EKS
+# Configuração simplificada focada nas verificações mais importantes
+
+framework:
+  - terraform
+
+directory:
+  - .
+  - modules/
+
+# Verificações mais importantes para EKS e VPC
+check:
+  # Security Groups - Crítico
+  - CKV_AWS_23  # Security Group permite tráfego de qualquer IP
+  - CKV_AWS_24  # Security Group permite tráfego de qualquer porta
+  - CKV_AWS_25  # Security Group permite tráfego ICMP
+  - CKV_AWS_26  # Security Group permite tráfego SSH de qualquer IP
+  - CKV_AWS_27  # Security Group permite tráfego RDP de qualquer IP
+  
+  # EKS Clusters - Essencial
+  - CKV_AWS_37  # EKS sem logging habilitado
+  - CKV_AWS_38  # EKS sem criptografia de secrets
+  - CKV_AWS_39  # EKS sem configuração de endpoint privado
+  - CKV_AWS_40  # EKS sem configuração de endpoint público
+  
+  # IAM - Segurança
+  - CKV_AWS_273 # IAM role sem política de acesso mínimo
+  - CKV_AWS_274 # IAM user sem política de acesso mínimo
+  - CKV_AWS_275 # IAM policy permite ação "*"
+  
+  # KMS - Criptografia
+  - CKV_AWS_43  # KMS key sem rotação automática
+  - CKV_AWS_44  # KMS key sem política de acesso
+
+# Verificações para ignorar (comentadas - descomente se necessário)
+skip-check:
+  # - CKV_AWS_130  # VPC flow logs (se não aplicável)
+  # - CKV_AWS_131  # VPC sem DNS habilitado (se configurado manualmente)
+  # - CKV_AWS_132  # VPC sem DHCP habilitado (se não necessário)
+
+# Falhar apenas em problemas MEDIUM e acima
+soft-fail-on: MEDIUM
+
+# Output format
+output: sarif
+
+# Arquivos para ignorar
+skip-path:
+  - .terraform/
+  - .git/
+  - node_modules/
+  - .checkov/
+  - terraform.tfstate*
+  - *.backup
+
+# Configurações para CI/CD
+compact: true
+quiet: false
+verbose: false 

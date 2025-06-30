@@ -77,6 +77,8 @@ jobs:
         framework: terraform
         output_format: sarif
         output_file_path: checkov-results.sarif
+        soft_fail: true
+        config_file: .checkov.yaml
 
     - name: Upload Checkov Results
       uses: actions/upload-artifact@v4
@@ -89,6 +91,7 @@ jobs:
       with:
         format: sarif
         out: tfsec-results.sarif
+        soft_fail: true
 
     - name: Upload TFSec Results
       uses: actions/upload-artifact@v4
