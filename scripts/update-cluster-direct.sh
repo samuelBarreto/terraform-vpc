@@ -8,7 +8,7 @@ set -e
 # Configurações padrão
 CLUSTER_NAME=${1:-"my-eks-cluster"}
 AWS_REGION=${2:-"us-east-1"}
-AWS_PROFILE=${3:-"admin-samuel"}
+AWS_PROFILE=${3:-"default"}
 
 echo "🚀 Iniciando atualização direta do cluster EKS..."
 echo "📋 Configurações:"

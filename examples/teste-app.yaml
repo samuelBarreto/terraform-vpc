@@ -1,24 +1,24 @@
 ---
-# Aplicação para o domínio plannerdirect.com
+# Aplicação para o domínio name.com
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: plannerdirect
+  name: name
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: plannerdirect-app
-  namespace: plannerdirect
+  name: name-app
+  namespace: name
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: plannerdirect-app
+      app: name-app
   template:
     metadata:
       labels:
-        app: plannerdirect-app
+        app: name-app
     spec:
       containers:
       - name: nginx
@@ -34,18 +34,18 @@ spec:
             memory: 256Mi
         env:
         - name: NGINX_HOST
-          value: "plannerdirect.com"
+          value: "teste.com"
         - name: NGINX_PORT
           value: "80"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: plannerdirect-service
-  namespace: plannerdirect
+  name: name-service
+  namespace: name
 spec:
   selector:
-    app: plannerdirect-app
+    app: name-app
   ports:
   - port: 80
     targetPort: 80
@@ -55,8 +55,8 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: plannerdirect-ingress
-  namespace: plannerdirect
+  name: name-ingress
+  namespace: name
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/rewrite-target: /
@@ -65,18 +65,18 @@ metadata:
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   rules:
-  - host: plannerdirect.com
+  - host: teste.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: plannerdirect-service
+            name: name-service
             port:
               number: 80
   # Configuração TLS (descomente quando tiver certificado)
   # tls:
   # - hosts:
-  #   - plannerdirect.com
-  #   secretName: plannerdirect-tls 
+  #   - teste.com
+  #   secretName: name-tls 

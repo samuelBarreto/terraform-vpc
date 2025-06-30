@@ -48,7 +48,7 @@ fi
 
 # Definir perfil AWS padrão se não especificado
 if [ -z "$AWS_PROFILE" ]; then
-    AWS_PROFILE="admin-samuel"
+    AWS_PROFILE="default"
     print_warning "AWS_PROFILE não definido, usando: $AWS_PROFILE"
 fi
 

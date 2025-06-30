@@ -38,7 +38,7 @@ terraform-lab/
 │   ├── test-route53.sh          # Testar configuração Route53
 │   └── help.sh                  # Ajuda e documentação
 ├── examples/               # Exemplos de aplicações
-│   ├── plannerdirect-app.yaml   # Aplicação exemplo
+│   ├── name-app.yaml   # Aplicação exemplo
 │   ├── nginx-ingress-example.yaml
 │   └── advanced-eks.tf
 ├── docs/                   # Documentação adicional
@@ -221,13 +221,13 @@ Este projeto inclui scripts de automação para facilitar o gerenciamento do clu
 #### 🔗 **Conectar ao Cluster**
 ```bash
 # Uso: ./scripts/connect-to-cluster.sh [CLUSTER_NAME] [AWS_REGION] [AWS_PROFILE]
-./scripts/connect-to-cluster.sh my-eks-cluster us-east-1 admin-samuel
+./scripts/connect-to-cluster.sh my-eks-cluster us-east-1 default
 
 # Valores padrão
 ./scripts/connect-to-cluster.sh
 # → CLUSTER_NAME=my-eks-cluster
 # → AWS_REGION=us-east-1
-# → AWS_PROFILE=admin-samuel
+# → AWS_PROFILE=default
 ```
 
 #### 🔄 **Atualizar Cluster EKS**
@@ -236,30 +236,30 @@ Este projeto inclui scripts de automação para facilitar o gerenciamento do clu
 chmod +x scripts/update-cluster.sh
 
 # Uso: ./scripts/update-cluster.sh [CLUSTER_NAME] [AWS_REGION] [AWS_PROFILE]
-./scripts/update-cluster.sh my-eks-cluster us-east-1 admin-samuel
+./scripts/update-cluster.sh my-eks-cluster us-east-1 default
 
 # Valores padrão
 ./scripts/update-cluster.sh
 # → CLUSTER_NAME=my-eks-cluster
 # → AWS_REGION=us-east-1
-# → AWS_PROFILE=admin-samuel
+# → AWS_PROFILE=default
 ```
 
 #### 🔍 **Verificação Pós-Deploy**
 ```bash
-# Uso: CLUSTER_NAME=my-eks-cluster AWS_REGION=us-east-1 AWS_PROFILE=admin-samuel ./scripts/post-deploy.sh
+# Uso: CLUSTER_NAME=my-eks-cluster AWS_REGION=us-east-1 AWS_PROFILE=default ./scripts/post-deploy.sh
 export CLUSTER_NAME=my-eks-cluster
 export AWS_REGION=us-east-1
-export AWS_PROFILE=admin-samuel
+export AWS_PROFILE=default
 ./scripts/post-deploy.sh
 
 # Ou com variáveis inline
-CLUSTER_NAME=my-eks-cluster AWS_REGION=us-east-1 AWS_PROFILE=admin-samuel ./scripts/post-deploy.sh
+CLUSTER_NAME=my-eks-cluster AWS_REGION=us-east-1 AWS_PROFILE=default ./scripts/post-deploy.sh
 
 # Valores padrão (se não especificado)
 # → CLUSTER_NAME=my-eks-cluster
 # → AWS_REGION=us-east-1
-# → AWS_PROFILE=admin-samuel
+# → AWS_PROFILE=default
 ```
 
 #### 🚀 **Deploy com Variáveis de Ambiente**
@@ -346,38 +346,38 @@ terraform apply -var='ingress_subnets=["subnet-08120d581b9165503","subnet-02c590
 #### 🌐 **Configurar Route53 (Completo)**
 ```bash
 # Uso: ./scripts/setup-route53.sh [DOMAIN_NAME] [CLUSTER_NAME] [AWS_REGION] [AWS_PROFILE]
-./scripts/setup-route53.sh plannerdirect.com my-eks-cluster us-east-1 admin-samuel
+./scripts/setup-route53.sh name.com my-eks-cluster us-east-1 default
 
 # Valores padrão
 ./scripts/setup-route53.sh
-# → DOMAIN_NAME=plannerdirect.com
+# → DOMAIN_NAME=name.com
 # → CLUSTER_NAME=my-eks-cluster
 # → AWS_REGION=us-east-1
-# → AWS_PROFILE=admin-samuel
+# → AWS_PROFILE=default
 ```
 
 #### 🌐 **Aplicar Configuração Route53**
 ```bash
 # Uso: ./scripts/apply-route53.sh [DOMAIN_NAME] [AWS_REGION] [AWS_PROFILE]
-./scripts/apply-route53.sh plannerdirect.com us-east-1 admin-samuel
+./scripts/apply-route53.sh name.com us-east-1 default
 
 # Valores padrão
 ./scripts/apply-route53.sh
-# → DOMAIN_NAME=plannerdirect.com
+# → DOMAIN_NAME=name.com
 # → AWS_REGION=us-east-1
-# → AWS_PROFILE=admin-samuel
+# → AWS_PROFILE=default
 ```
 
 #### 🌐 **Testar Configuração Route53**
 ```bash
 # Uso: ./scripts/test-route53.sh [DOMAIN_NAME] [AWS_REGION] [AWS_PROFILE]
-./scripts/test-route53.sh plannerdirect.com us-east-1 admin-samuel
+./scripts/test-route53.sh name.com us-east-1 default
 
 # Valores padrão
 ./scripts/test-route53.sh
-# → DOMAIN_NAME=plannerdirect.com
+# → DOMAIN_NAME=name.com
 # → AWS_REGION=us-east-1
-# → AWS_PROFILE=admin-samuel
+# → AWS_PROFILE=default
 ```
 
 #### ❓ **Ajuda e Documentação**
@@ -421,7 +421,7 @@ chmod +x scripts/*.sh
 ./scripts/connect-to-cluster.sh meu-cluster-prod us-west-2 admin-prod
 
 # Usar domínio diferente
-./scripts/apply-route53.sh meudominio.com us-east-1 admin-samuel
+./scripts/apply-route53.sh meudominio.com us-east-1 default
 
 # Usar timeout maior para ingress
 ./scripts/validate-ingress.sh ingress-nginx nginx-ingress-ingress-nginx-controller 600
@@ -512,10 +512,10 @@ kubectl describe service nginx-ingress-ingress-nginx-controller -n ingress-nginx
 **Erro: "Zona hospedada não encontrada"**
 ```bash
 # Verificar zonas hospedadas
-aws route53 list-hosted-zones --profile admin-samuel
+aws route53 list-hosted-zones --profile default
 
 # Verificar se o domínio está configurado no Route53
-aws route53 list-hosted-zones --profile admin-samuel --query "HostedZones[?Name=='seu-dominio.com.']"
+aws route53 list-hosted-zones --profile default --query "HostedZones[?Name=='seu-dominio.com.']"
 ```
 
 **Erro: "HostedZoneId incorreto"**
@@ -535,8 +535,8 @@ chmod +x scripts/update-cluster.sh
 ./scripts/update-cluster.sh
 
 # Opção 2: Manual
-aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster --profile admin-samuel
-export AWS_PROFILE=admin-samuel
+aws eks update-kubeconfig --region us-east-1 --name my-eks-cluster --profile default
+export AWS_PROFILE=default
 export AWS_REGION=us-east-1
 terraform plan
 ```
@@ -558,7 +558,7 @@ kubectl get nodes
 ./scripts/update-cluster-direct.sh
 
 # Ou recriar recursos manualmente
-kubectl apply -f examples/plannerdirect-app.yaml
+kubectl apply -f examples/name-app.yaml
 ```
 
 ## 🔐 Configuração de Acesso
@@ -741,19 +741,19 @@ kubectl get pods -n kube-system
 **Erro: "Cluster não está pronto"**
 ```bash
 # Aguardar cluster ficar ativo
-aws eks wait cluster-active --name my-eks-cluster --region us-east-1 --profile admin-samuel
+aws eks wait cluster-active --name my-eks-cluster --region us-east-1 --profile default
 
 # Verificar status
-aws eks describe-cluster --name my-eks-cluster --region us-east-1 --profile admin-samuel
+aws eks describe-cluster --name my-eks-cluster --region us-east-1 --profile default
 ```
 
 **Erro: "Node groups não estão prontos"**
 ```bash
 # Aguardar node groups ficarem ativos
-aws eks wait nodegroup-active --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile admin-samuel
+aws eks wait nodegroup-active --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile default
 
 # Verificar status
-aws eks describe-nodegroup --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile admin-samuel
+aws eks describe-nodegroup --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile default
 ```
 
 **Erro: "Problemas de conectividade"**
@@ -979,19 +979,19 @@ kubectl get pods -n ingress-nginx
 **Erro: "Cluster não está pronto"**
 ```bash
 # Aguardar cluster ficar ativo
-aws eks wait cluster-active --name my-eks-cluster --region us-east-1 --profile admin-samuel
+aws eks wait cluster-active --name my-eks-cluster --region us-east-1 --profile default
 
 # Verificar status
-aws eks describe-cluster --name my-eks-cluster --region us-east-1 --profile admin-samuel
+aws eks describe-cluster --name my-eks-cluster --region us-east-1 --profile default
 ```
 
 **Erro: "Node groups não estão prontos"**
 ```bash
 # Aguardar node groups ficarem ativos
-aws eks wait nodegroup-active --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile admin-samuel
+aws eks wait nodegroup-active --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile default
 
 # Verificar status
-aws eks describe-nodegroup --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile admin-samuel
+aws eks describe-nodegroup --cluster-name my-eks-cluster --nodegroup-name default --region us-east-1 --profile default
 ```
 
 **Erro: "Problemas de conectividade"**
@@ -1009,7 +1009,7 @@ kubectl config current-context
 ./scripts/update-cluster-direct.sh
 
 # Ou recriar recursos manualmente
-kubectl apply -f examples/plannerdirect-app.yaml
+kubectl apply -f examples/name-app.yaml
 ```
 
 ### Atualização do Cluster
@@ -1034,7 +1034,7 @@ terraform destroy
 
 ## **🌐 Configuração de Domínio Personalizado**
 
-### **Usando seu próprio domínio (ex: plannerdirect.com)**
+### **Usando seu próprio domínio (ex: name.com)**
 
 1. **Configure o NGINX Ingress Controller:**
    ```bash
@@ -1062,7 +1062,7 @@ terraform destroy
 3. **Aplique sua aplicação:**
    ```bash
    # Use o exemplo fornecido ou crie sua própria aplicação
-   kubectl apply -f examples/plannerdirect-app.yaml
+   kubectl apply -f examples/name-app.yaml
    ```
 
 ### **Vantagens da Configuração Dinâmica:**
@@ -1137,7 +1137,7 @@ git clone <repository-url>
 cd terraform-vpc
 
 # 2. Configure AWS CLI
-aws configure --profile admin-samuel
+aws configure --profile default
 
 # 3. Configure terraform.tfvars
 cp terraform.tfvars.example terraform.tfvars
@@ -1256,7 +1256,7 @@ terraform state list
 kubectl delete namespace ingress-nginx --ignore-not-found=true
 
 # 2. Deletar outras aplicações
-kubectl delete -f examples/plannerdirect-app.yaml --ignore-not-found=true
+kubectl delete -f examples/name-app.yaml --ignore-not-found=true
 
 # 3. Verificar se não há recursos pendentes
 kubectl get all --all-namespaces
@@ -1283,7 +1283,7 @@ rm -f .terraform.lock.hcl
 kubectl config delete-context arn:aws:eks:us-east-1:ACCOUNT:cluster/my-eks-cluster
 
 # 3. Verificar se tudo foi deletado
-aws eks list-clusters --region us-east-1 --profile admin-samuel
+aws eks list-clusters --region us-east-1 --profile default
 ```
 
 #### **📋 Checklist de Operações**
@@ -1325,7 +1325,7 @@ aws eks list-clusters --region us-east-1 --profile admin-samuel
 terraform init -upgrade
 
 # Erro: "Permissões AWS"
-aws sts get-caller-identity --profile admin-samuel
+aws sts get-caller-identity --profile default
 
 # Erro: "VPC já existe"
 terraform import aws_vpc.this vpc-12345678
@@ -1334,7 +1334,7 @@ terraform import aws_vpc.this vpc-12345678
 ##### **Problemas no Update**
 ```bash
 # Erro: "Cluster não está pronto"
-aws eks wait cluster-active --name my-eks-cluster --region us-east-1 --profile admin-samuel
+aws eks wait cluster-active --name my-eks-cluster --region us-east-1 --profile default
 
 # Erro: "Autenticação Kubernetes"
 ./scripts/update-cluster-direct.sh
@@ -1349,10 +1349,10 @@ kubectl get all --all-namespaces
 terraform destroy -target=module.eks.helm_release.apps
 
 # Erro: "Load Balancer não deletado"
-aws elbv2 describe-load-balancers --region us-east-1 --profile admin-samuel
+aws elbv2 describe-load-balancers --region us-east-1 --profile default
 
 # Erro: "VPC não deletado"
-aws ec2 describe-vpcs --region us-east-1 --profile admin-samuel
+aws ec2 describe-vpcs --region us-east-1 --profile default
 ```
 
 #### **⏱️ Tempos Estimados**

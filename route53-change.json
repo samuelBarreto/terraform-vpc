@@ -3,7 +3,7 @@
         {
             "Action": "UPSERT",
             "ResourceRecordSet": {
-                "Name": "plannerdirect.com",
+                "Name": "name.com",
                 "Type": "A",
                 "AliasTarget": {
                     "HostedZoneId": "Z26RNL4JYFTOTI",
@@ -15,7 +15,7 @@
         {
             "Action": "UPSERT",
             "ResourceRecordSet": {
-                "Name": "www.plannerdirect.com",
+                "Name": "www.name.com",
                 "Type": "A",
                 "AliasTarget": {
                     "HostedZoneId": "Z26RNL4JYFTOTI",

@@ -1,18 +1,18 @@
 #!/bin/bash
 
 # =============================================================================
-# CONFIGURAÇÃO DO ROUTE 53 PARA PLANNERDIRECT.COM
+# CONFIGURAÇÃO DO ROUTE 53 PARA name.COM
 # =============================================================================
 # Uso: ./scripts/setup-route53.sh [DOMAIN_NAME] [CLUSTER_NAME] [AWS_REGION] [AWS_PROFILE]
-# Exemplo: ./scripts/setup-route53.sh plannerdirect.com my-eks-cluster us-east-1 admin-samuel
+# Exemplo: ./scripts/setup-route53.sh name.com my-eks-cluster us-east-1 default
 
 set -e
 
 # Parâmetros via linha de comando com valores padrão
-DOMAIN_NAME=${1:-"plannerdirect.com"}
+DOMAIN_NAME=${1:-"teste.com"}
 CLUSTER_NAME=${2:-"my-eks-cluster"}
 AWS_REGION=${3:-"us-east-1"}
-AWS_PROFILE=${4:-"admin-samuel"}
+AWS_PROFILE=${4:-"default"}
 
 echo "================================
 CONFIGURAÇÃO DO ROUTE 53
@@ -152,17 +152,17 @@ echo "[INFO] DNS propagado com sucesso!"
 echo "================================
 6. APLICANDO APLICAÇÃO
 ================================
-[INFO] Aplicando aplicação do PlannerDirect..."
-kubectl apply -f examples/plannerdirect-app.yaml
+[INFO] Aplicando aplicação do name..."
+kubectl apply -f examples/name-app.yaml
 
 echo "[INFO] Aguardando pods ficarem prontos..."
-kubectl wait --for=condition=Ready pod -l app=plannerdirect-app -n plannerdirect --timeout=300s
+kubectl wait --for=condition=Ready pod -l app=name-app -n name --timeout=300s
 
 echo "================================
 7. TESTANDO CONECTIVIDADE
 ================================
 [INFO] Verificando Ingress..."
-kubectl get ingress -n plannerdirect
+kubectl get ingress -n name
 
 echo "[INFO] Testando conectividade..."
 echo "[INFO] Teste manual: curl -H 'Host: $DOMAIN_NAME' http://$LB_HOSTNAME"
@@ -178,7 +178,7 @@ echo "[INFO] Para verificar se está funcionando:"
 echo "curl -I http://$DOMAIN_NAME"
 echo ""
 echo "[INFO] Para ver logs da aplicação:"
-echo "kubectl logs -n plannerdirect -l app=plannerdirect-app"
+echo "kubectl logs -n name -l app=name-app"
 echo ""
 echo "[INFO] Para ver logs do Ingress:"
 echo "kubectl logs -n ingress-nginx -l app.kubernetes.io/name=ingress-nginx"

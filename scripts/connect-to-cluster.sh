@@ -2,14 +2,14 @@
 
 # Script para conectar ao cluster EKS
 # Uso: ./scripts/connect-to-cluster.sh [CLUSTER_NAME] [AWS_REGION] [AWS_PROFILE]
-# Exemplo: ./scripts/connect-to-cluster.sh my-eks-cluster us-east-1 admin-samuel
+# Exemplo: ./scripts/connect-to-cluster.sh my-eks-cluster us-east-1 default
 
 set -e
 
 # Parâmetros via linha de comando com valores padrão
 CLUSTER_NAME=${1:-"my-eks-cluster"}
 AWS_REGION=${2:-"us-east-1"}
-AWS_PROFILE=${3:-"admin-samuel"}
+AWS_PROFILE=${3:-"default"}
 
 echo "🔗 Conectando ao cluster EKS..."
 echo ""

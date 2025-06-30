@@ -2,14 +2,14 @@
 
 # Script para testar a configuração do Route53
 # Uso: ./scripts/test-route53.sh [DOMAIN_NAME] [AWS_REGION] [AWS_PROFILE]
-# Exemplo: ./scripts/test-route53.sh plannerdirect.com us-east-1 admin-samuel
+# Exemplo: ./scripts/test-route53.sh name.com us-east-1 default
 
 set -e
 
 # Parâmetros via linha de comando com valores padrão
-DOMAIN_NAME=${1:-"plannerdirect.com"}
+DOMAIN_NAME=${1:-"name.com"}
 AWS_REGION=${2:-"us-east-1"}
-AWS_PROFILE=${3:-"admin-samuel"}
+AWS_PROFILE=${3:-"default"}
 
 echo "🌐 TESTE DA CONFIGURAÇÃO ROUTE 53"
 echo "================================="

@@ -3,7 +3,7 @@
 # =============================================================================
 
 aws_region = "us-east-1"
-profile    = "admin-samuel"
+profile    = "default"
 name       = "my-eks-cluster"
 environment = "dev"
 
