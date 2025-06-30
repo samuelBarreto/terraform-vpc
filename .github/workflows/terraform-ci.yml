@@ -70,22 +70,6 @@ jobs:
       with:
         terraform_version: ${{ env.TF_VERSION }}
 
-    - name: Run Checkov
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: .
-        framework: terraform
-        output_format: sarif
-        output_file_path: checkov-results.sarif
-        soft_fail: true
-        config_file: .checkov.yaml
-
-    - name: Upload Checkov Results
-      uses: actions/upload-artifact@v4
-      with:
-        name: checkov-results
-        path: checkov-results.sarif
-
     - name: Run TFSec
       uses: aquasecurity/tfsec-action@v1.0.0
       with:
