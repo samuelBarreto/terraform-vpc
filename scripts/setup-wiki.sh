@@ -298,4 +298,7 @@ main() {
 }
 
 # Executar função principal
-main "$@" 
+main "$@"
+
+# Abrir no navegador
+start https://github.com/samuelBarreto/terraform-vpc/wiki 
